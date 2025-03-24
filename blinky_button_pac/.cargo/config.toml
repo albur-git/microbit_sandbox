@@ -1,0 +1,18 @@
+# The following options will be automatically added to each execution of `cargo run` or `cargo build` 
+# commands when the target matches the specified configuration (ARM architecture, no OS).
+[target.'cfg(all(target_arch = "arm", target_os = "none"))']
+# Use `probe-rs` as the runner for flashing and debugging the firmware on the specified chip.
+runner = "probe-rs run --chip nRF52833_xxAA --catch-reset --catch-hardfault --allow-erase-all"
+
+# Additional Rust flags for linking, specifically to use a custom linker script (`link.x`).
+# This is often used in embedded development to define memory layout and sections.
+# Note: the linker needs a memory.x files specifying the memory regions of the target
+rustflags = [
+  "-C", "link-arg=-Tlink.x",
+]
+
+# Set the default target for `cargo build` to `thumbv7em-none-eabihf`,
+# which is a common target for ARM Cortex-M microcontrollers.
+# the target for a chip can be found on it's crate.io pac page: https://crates.io/crates/nrf52833-pac
+[build]
+target = "thumbv7em-none-eabihf"

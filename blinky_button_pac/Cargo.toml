@@ -1,0 +1,20 @@
+[package]
+name = "blinky_button_pac"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }
+    # Low level access to Cortex-M processors, see https://docs.rs/cortex-m/latest/cortex_m/
+    # command: cargo add cortex-m --features critical-section-single-core
+cortex-m-rt = "0.7.5"
+    # Startup code and minimal runtime for Cortex-M microcontrollers, see https://docs.rs/cortex-m-rt/latest/cortex_m_rt/
+    # command: cargo add cortex-m-rt
+nrf52833-pac = { version = "0.12.2", features = ["rt"] }
+    # Peripheral Access Crates (PACs) for Nordic's nRF series of Cortex-M microcontrollers, see https://docs.rs/nrf52833-pac/latest/nrf52833_pac/
+    # add rt feature to be able to use interrupts
+    # command: cargo add nrf52833-pac --features rt
+
+rtt-target = "0.6.1"
+    # Target side implementation of the RTT (Real-Time Transfer) I/O protocol, see https://docs.rs/rtt-target/
+    # command: cargo add rtt-target

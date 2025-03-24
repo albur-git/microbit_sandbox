@@ -1,0 +1,5 @@
+ // Sets the project target for visual studio, allowing it to ignore #![no_std] issues and such during background compilation
+{
+    "rust-analyzer.check.allTargets": false,
+    "rust-analyzer.cargo.target": "thumbv7em-none-eabihf"
+}

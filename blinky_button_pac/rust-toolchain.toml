@@ -1,0 +1,11 @@
+[toolchain]
+
+channel = "stable"
+    # specifies to use latest stable release of rust
+components = ["rustfmt", "llvm-tools", "clippy"]
+    # specifies all components of the rust toolchain
+    # - rustfmt: formatting tool
+    # - llvm-tools: Low-Level Virtual Machine, used for low-level analysis, instrumentation, and optimization
+    # - clippy: collection of lints to analyze code
+targets = ["thumbv7em-none-eabihf"]
+    # specifies target for the compiler
