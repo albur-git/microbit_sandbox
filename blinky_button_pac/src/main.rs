@@ -5,14 +5,14 @@ mod button;
 mod led_matrix;
 mod timer;
 mod gpio_handler;
+mod timer_task;
 
 use gpio_handler::{GpioHandler, GpioPortId};
 use button::Button;
 use nrf52833_pac as pac;
 use rtt_target::{rprintln, rtt_init_print};
 use timer::Timer;
-
-
+use timer_task::BlinkyTask;
 
 #[cortex_m_rt::entry]
 fn start() -> ! {
@@ -29,16 +29,19 @@ fn start() -> ! {
     // Initialize a Button 
     Button::init(peripherals.GPIOTE, &port_0);
     
-    // == [Timer] ==
-    Timer::init(peripherals.TIMER0);
-   
     // == [LEDs] ==
-    let gpio_handler = GpioHandler::init(GpioPortId::Port0, port_0);
-    let led_col1_output = gpio_handler.get_push_pull_output(GpioPortId::Port0, 28);
+    let gpio_handler = GpioHandler::new(GpioPortId::Port0, port_0);
+    let _led_col1_output = gpio_handler.get_push_pull_output(GpioPortId::Port0, 28);
     let led_row1_output = gpio_handler.get_push_pull_output(GpioPortId::Port0, 21);
 
-    led_col1_output.set_low();
-    led_row1_output.set_high();
+    // led_col1_output.set_low();
+    // led_row1_output.set_high();
+
+    let blinky_task = BlinkyTask::new(led_row1_output);
+    // == [Timer] ==
+    Timer::init(peripherals.TIMER0, blinky_task);
+   
+
 
     rprintln!("Starting Main-Loop");
     loop {
