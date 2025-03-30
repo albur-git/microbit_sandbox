@@ -10,6 +10,7 @@ mod gpioe_task;
 
 use gpio_handler::{GpioHandler, GpioPortId};
 use gpioe_handler::GpioeHandler;
+use gpioe_task::{ButtonAAction, ButtonBAction};
 use nrf52833_pac as pac;
 use rtt_target::{rprintln, rtt_init_print};
 use timer::Timer;
@@ -31,8 +32,8 @@ fn start() -> ! {
     let led_row1_output = gpio_p0_handler.get_push_pull_output(GpioPortId::Port0, 21);
 
     // Initialize a Button 
-    let button_a_task = gpio_p0_handler.get_input(0, 14).into_button_a_event_task();
-    let button_b_task = gpio_p0_handler.get_input(1, 23).into_button_b_event_task();
+    let button_a_task = gpio_p0_handler.get_input(0, 14).into_button_event_task(ButtonAAction);
+    let button_b_task = gpio_p0_handler.get_input(1, 23).into_button_event_task(ButtonBAction);
     GpioeHandler::init(peripherals.GPIOTE, button_a_task, button_b_task);
 
     // == [Timer] ==

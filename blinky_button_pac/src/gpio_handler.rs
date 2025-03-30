@@ -3,8 +3,7 @@ use core::cell::RefCell;
 use cortex_m::interrupt::{CriticalSection, Mutex};
 use nrf52833_pac::{P0};
 
-use crate::gpioe_task::{ButtonATask, ButtonBTask};
-
+use crate::gpioe_task::GpioInput;
 
 static PORT_0_REG: Mutex<RefCell<Option<P0>>> = Mutex::new(RefCell::new(None));
 
@@ -47,23 +46,6 @@ impl GpioPushPullOutput {
                     }
                 } 
         }
-    }
-}
-
-pub struct GpioInput {
-    pub event_channel: u32,
-    pub event_channel_bit_mask: u32,
-    pub pin: u32,
-    pub pin_bit_mask: u32,
-}
-
-impl GpioInput {
-    pub fn into_button_a_event_task(self) -> ButtonATask {
-        ButtonATask::new(self)
-    }
-
-    pub fn into_button_b_event_task(self) -> ButtonBTask {
-        ButtonBTask::new(self)
     }
 }
 

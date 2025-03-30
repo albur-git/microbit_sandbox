@@ -2,30 +2,29 @@ use core::cell::RefCell;
 use cortex_m::interrupt::Mutex;
 use nrf52833_pac::{self as pac, GPIOTE, interrupt};
 
-use crate::{gpio_handler::GpioInput, gpioe_task::ButtonATask, gpioe_task::ButtonBTask};
+use crate::gpioe_task::{ButtonAAction, ButtonAction, ButtonBAction, ButtonTask, GpioInput};
 
-pub struct GpioeHandler {
+pub struct GpioeHandler<A: ButtonAction, B: ButtonAction> {
     gpio_tasks_and_events: Mutex<RefCell<Option<GPIOTE>>>,
-    button_a_task: Mutex<RefCell<Option<ButtonATask>>>,
-    button_b_task: Mutex<RefCell<Option<ButtonBTask>>>,
+    button_a_task: Mutex<RefCell<Option<ButtonTask<A>>>>,
+    button_b_task: Mutex<RefCell<Option<ButtonTask<B>>>>,
 }
 
-static GPIOE_HANDLER: GpioeHandler = GpioeHandler {
+static GPIOE_HANDLER: GpioeHandler<ButtonAAction, ButtonBAction> = GpioeHandler {
     gpio_tasks_and_events: Mutex::new(RefCell::new(None)),
     button_a_task: Mutex::new(RefCell::new(None)),
     button_b_task: Mutex::new(RefCell::new(None)),
 };
 
-impl GpioeHandler {
+impl GpioeHandler<ButtonAAction, ButtonBAction> {
     // Initialize the button and related peripherals
     pub fn init(
         gpio_tasks_and_events: GPIOTE,
-        button_a_task: ButtonATask,
-        button_b_task: ButtonBTask,
+        button_a_task: ButtonTask<ButtonAAction>,
+        button_b_task: ButtonTask<ButtonBAction>,
     ) {
         GpioeHandler::init_input_event(&gpio_tasks_and_events, &button_a_task.input_button);
         GpioeHandler::init_input_event(&gpio_tasks_and_events, &button_b_task.input_button);
-        // Store the button and peripherals in the stati
         cortex_m::interrupt::free(|cs| {
             GPIOE_HANDLER.gpio_tasks_and_events.borrow(cs).replace(Some(gpio_tasks_and_events));
             GPIOE_HANDLER.button_a_task.borrow(cs).replace(Some(button_a_task));
@@ -54,17 +53,11 @@ impl GpioeHandler {
         cortex_m::interrupt::free(|cs| {
             if let Some(ref gpio_tasks_and_events) = *GPIOE_HANDLER.gpio_tasks_and_events.borrow(cs).borrow() {
                 if let Some(ref button_a_task) = *GPIOE_HANDLER.button_a_task.borrow(cs).borrow() {
-                    if gpio_tasks_and_events.events_in[button_a_task.input_button.event_channel as usize].read().bits() != 0 {
-                        gpio_tasks_and_events.events_in[button_a_task.input_button.event_channel as usize].write(|w| w);    // clear event
-                        button_a_task.execute(cs);
-                    }
+                    button_a_task.check_event_clear_and_execute_task(gpio_tasks_and_events);
                 }
 
                 if let Some(ref button_b_task) = *GPIOE_HANDLER.button_b_task.borrow(cs).borrow() {
-                    if gpio_tasks_and_events.events_in[button_b_task.input_button.event_channel as usize].read().bits() != 0 {
-                        gpio_tasks_and_events.events_in[button_b_task.input_button.event_channel as usize].write(|w| w);    // clear event
-                        button_b_task.execute(cs);
-                    }
+                    button_b_task.check_event_clear_and_execute_task(gpio_tasks_and_events);
                 }
             }
         });
