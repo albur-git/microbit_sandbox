@@ -5,7 +5,7 @@ use nrf52833_pac::{self as pac, interrupt, NVIC, TIMER0};
 use core::sync::atomic::{AtomicU32, Ordering};
 use rtt_target::{rprintln};
 
-use crate::timer_task::{BlinkyTask, TimerTask};
+use crate::timer_task::BlinkyTask;
 
 
 static TICK_COUNT: AtomicU32 = AtomicU32::new(0);

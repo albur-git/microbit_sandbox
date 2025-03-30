@@ -1,26 +1,17 @@
 
 use cortex_m::interrupt::CriticalSection;
-use crate::gpio_handler::PushPullOutput;
+use crate::gpio_handler::GpioPushPullOutput;
 
-// === [ Traits ] ===
-pub trait TimerTask {
-    /// Execute the task's operation
-    fn execute(&self, cs: &CriticalSection);
-}
-
-// === [ Task Implementation ] ===
 pub struct BlinkyTask {
-    output_pin: PushPullOutput
-}
-
-impl TimerTask for BlinkyTask {
-    fn execute(&self, cs: &CriticalSection) {
-        self.output_pin.toggle(cs);
-    }
+    output_pin: GpioPushPullOutput
 }
 
 impl BlinkyTask {
-    pub fn new(output_pin: PushPullOutput) -> BlinkyTask {
+    pub fn new(output_pin: GpioPushPullOutput) -> BlinkyTask {
         BlinkyTask { output_pin }
+    }
+
+    pub fn execute(&self, cs: &CriticalSection) {
+        self.output_pin.toggle(cs);
     }
 }
