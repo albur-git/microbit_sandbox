@@ -1,9 +1,10 @@
+mod led_matrix;
 use core::cell::RefCell;
-
 use cortex_m::interrupt::{CriticalSection, Mutex};
-use nrf52833_pac::{P0};
+use nrf52833_pac::P0;
 
-use crate::gpioe_task::GpioInput;
+use crate::gpioe_handler::gpio_input::GpioInput;
+
 
 static PORT_0_REG: Mutex<RefCell<Option<P0>>> = Mutex::new(RefCell::new(None));
 

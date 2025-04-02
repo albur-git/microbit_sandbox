@@ -1,8 +1,14 @@
+pub mod button_action;
+pub mod gpio_input;
+mod button_task;
+
 use core::cell::RefCell;
 use cortex_m::interrupt::Mutex;
 use nrf52833_pac::{self as pac, GPIOTE, interrupt};
+use gpio_input::GpioInput;
 
-use crate::gpioe_task::{ButtonAAction, ButtonAction, ButtonBAction, ButtonTask, GpioInput};
+use self::button_action::{ButtonAAction, ButtonAction, ButtonBAction};
+use self::button_task::ButtonTask;
 
 pub struct GpioeHandler<A: ButtonAction, B: ButtonAction> {
     gpio_tasks_and_events: Mutex<RefCell<Option<GPIOTE>>>,
@@ -16,6 +22,7 @@ static GPIOE_HANDLER: GpioeHandler<ButtonAAction, ButtonBAction> = GpioeHandler 
     button_b_task: Mutex::new(RefCell::new(None)),
 };
 
+// concrete implementation of GpioeHandler for ButtonAAction and ButtonBAction --> provides a specific instantiation of GpioeHandler with those types
 impl GpioeHandler<ButtonAAction, ButtonBAction> {
     // Initialize the button and related peripherals
     pub fn init(

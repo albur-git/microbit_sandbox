@@ -56,7 +56,7 @@ fn TIMER0() {
             timer_peripheral.events_compare[TIMER_0.channel].write(|w| w.events_compare().clear_bit());
         }
 
-        if let Some(ref task) = *TIMER_0.task.borrow(cs).borrow() {
+        if let Some(ref mut task) = *TIMER_0.task.borrow(cs).borrow_mut() {
             task.execute(cs);
         }
     });
